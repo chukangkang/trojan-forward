@@ -84,6 +84,14 @@ public:
         std::string cert;
         std::string ca;
     } mysql;
+    class SOCKS5Config {
+    public:
+        bool enabled;
+        std::string server_addr;
+        uint16_t server_port;
+        std::string username;
+        std::string password;
+    } socks5;
     void load(const std::string &filename);
     void populate(const std::string &JSON);
     bool sip003();

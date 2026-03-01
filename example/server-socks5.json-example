@@ -1,0 +1,18 @@
+{
+    "run_type": "server",
+    "local_addr": "0.0.0.0",
+    "local_port": 443,
+    "password": ["password1"],
+    "log_level": 1,
+    "ssl": {
+        "cert": "/path/to/cert.crt",
+        "key": "/path/to/key.key"
+    },
+    "socks5": {
+        "enabled": true,
+        "server_addr": "192.168.1.100",
+        "server_port": 1080,
+        "username": "",
+        "password": ""
+    }
+}

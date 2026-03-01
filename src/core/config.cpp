@@ -112,6 +112,11 @@ void Config::populate(const ptree &tree) {
     mysql.key = tree.get("mysql.key", string());
     mysql.cert = tree.get("mysql.cert", string());
     mysql.ca = tree.get("mysql.ca", string());
+    socks5.enabled = tree.get("socks5.enabled", false);
+    socks5.server_addr = tree.get("socks5.server_addr", string("127.0.0.1"));
+    socks5.server_port = tree.get("socks5.server_port", uint16_t(1080));
+    socks5.username = tree.get("socks5.username", string());
+    socks5.password = tree.get("socks5.password", string());
 }
 
 bool Config::sip003() {

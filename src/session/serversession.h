@@ -28,6 +28,7 @@ class ServerSession : public Session {
 private:
     enum Status {
         HANDSHAKE,
+        SOCKS5_CONNECT,  // Connecting to SOCKS5 proxy
         FORWARD,
         UDP_FORWARD,
         DESTROY
@@ -38,6 +39,9 @@ private:
     Authenticator *auth;
     std::string auth_password;
     const std::string &plain_http_response;
+    // SOCKS5 proxy target address (the original destination)
+    std::string target_addr;
+    uint16_t target_port;
     void destroy();
     void in_async_read();
     void in_async_write(const std::string &data);
@@ -47,6 +51,11 @@ private:
     void out_async_write(const std::string &data);
     void out_recv(const std::string &data);
     void out_sent();
+    void socks5_connect();
+    void socks5_send_handshake(const std::string &data);
+    void socks5_handshake_recv(const std::string &data);
+    void socks5_send_connect_request();
+    void socks5_connect_recv(const std::string &data);
     void udp_async_read();
     void udp_async_write(const std::string &data, const boost::asio::ip::udp::endpoint &endpoint);
     void udp_recv(const std::string &data, const boost::asio::ip::udp::endpoint &endpoint);
