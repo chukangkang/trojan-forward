@@ -301,6 +301,9 @@ void ServerSession::in_recv(const string &data) {
     } else if (status == UDP_FORWARD) {
         udp_data_buf += data;
         udp_sent();
+    } else if (status == SOCKS5_CONNECT) {
+        // Buffer data until SOCKS5 connection is established
+        out_write_buf += data;
     }
 }
 
@@ -309,6 +312,8 @@ void ServerSession::in_sent() {
         out_async_read();
     } else if (status == UDP_FORWARD) {
         udp_async_read();
+    } else if (status == SOCKS5_CONNECT) {
+        // Still connecting to SOCKS5 proxy, wait
     }
 }
 
@@ -322,6 +327,8 @@ void ServerSession::out_recv(const string &data) {
 void ServerSession::out_sent() {
     if (status == FORWARD) {
         in_async_read();
+    } else if (status == SOCKS5_CONNECT) {
+        // Still connecting to SOCKS5 proxy, wait
     }
 }
 
