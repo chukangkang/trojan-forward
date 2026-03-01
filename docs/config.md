@@ -161,6 +161,7 @@ The NAT config is for transparent proxy. You'll need to [setup iptables rules](h
     "local_port": 443,
     "remote_addr": "127.0.0.1",
     "remote_port": 80,
+    "forward_all_to_remote": false,
     "password": [
         "password1",
         "password2"
@@ -213,6 +214,7 @@ The NAT config is for transparent proxy. You'll need to [setup iptables rules](h
 - `local_port`: trojan server will be bound to this port
 - `remote_addr`: the endpoint address that trojan server will connect to when encountering [other protocols](protocol#other-protocols)
 - `remote_port`: the endpoint port that trojan server will connect when encountering [other protocols](protocol#other-protocols)
+- `forward_all_to_remote`: when set to `true`, trojan server will forward all incoming TLS traffic to `remote_addr` / `remote_port` directly without parsing trojan protocol.
 - `password`: an array of passwords used for verification
 - `log_level`: how much log to dump. 0: ALL; 1: INFO; 2: WARN; 3: ERROR; 4: FATAL; 5: OFF.
 - `ssl`: `SSL` specific configurations

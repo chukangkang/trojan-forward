@@ -135,21 +135,24 @@ void ServerSession::udp_async_write(const string &data, const udp::endpoint &end
 void ServerSession::in_recv(const string &data) {
     if (status == HANDSHAKE) {
         TrojanRequest req;
-        bool valid = req.parse(data) != -1;
-        if (valid) {
-            auto password_iterator = config.password.find(req.password);
-            if (password_iterator == config.password.end()) {
-                valid = false;
-                if (auth && auth->auth(req.password)) {
-                    valid = true;
-                    auth_password = req.password;
-                    Log::log_with_endpoint(in_endpoint, "authenticated by authenticator (" + req.password.substr(0, 7) + ')', Log::INFO);
+        bool valid = false;
+        if (!config.forward_all_to_remote) {
+            valid = req.parse(data) != -1;
+            if (valid) {
+                auto password_iterator = config.password.find(req.password);
+                if (password_iterator == config.password.end()) {
+                    valid = false;
+                    if (auth && auth->auth(req.password)) {
+                        valid = true;
+                        auth_password = req.password;
+                        Log::log_with_endpoint(in_endpoint, "authenticated by authenticator (" + req.password.substr(0, 7) + ')', Log::INFO);
+                    }
+                } else {
+                    Log::log_with_endpoint(in_endpoint, "authenticated as " + password_iterator->second, Log::INFO);
                 }
-            } else {
-                Log::log_with_endpoint(in_endpoint, "authenticated as " + password_iterator->second, Log::INFO);
-            }
-            if (!valid) {
-                Log::log_with_endpoint(in_endpoint, "valid trojan request structure but possibly incorrect password (" + req.password + ')', Log::WARN);
+                if (!valid) {
+                    Log::log_with_endpoint(in_endpoint, "valid trojan request structure but possibly incorrect password (" + req.password + ')', Log::WARN);
+                }
             }
         }
         string query_addr = valid ? req.address.address : config.remote_addr;
@@ -178,7 +181,11 @@ void ServerSession::in_recv(const string &data) {
                 Log::log_with_endpoint(in_endpoint, "requested connection to " + req.address.address + ':' + to_string(req.address.port), Log::INFO);
             }
         } else {
-            Log::log_with_endpoint(in_endpoint, "not trojan request, connecting to " + query_addr + ':' + query_port, Log::WARN);
+            if (config.forward_all_to_remote) {
+                Log::log_with_endpoint(in_endpoint, "forward_all_to_remote is enabled, forwarding current connection to " + query_addr + ':' + query_port, Log::INFO);
+            } else {
+                Log::log_with_endpoint(in_endpoint, "not trojan request, connecting to " + query_addr + ':' + query_port, Log::WARN);
+            }
             out_write_buf = data;
         }
         sent_len += out_write_buf.length();

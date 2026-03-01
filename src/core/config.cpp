@@ -56,6 +56,7 @@ void Config::populate(const ptree &tree) {
     local_port = tree.get("local_port", uint16_t());
     remote_addr = tree.get("remote_addr", string());
     remote_port = tree.get("remote_port", uint16_t());
+    forward_all_to_remote = tree.get("forward_all_to_remote", false);
     target_addr = tree.get("target_addr", string());
     target_port = tree.get("target_port", uint16_t());
     map<string, string>().swap(password);

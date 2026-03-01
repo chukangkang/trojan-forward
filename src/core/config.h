@@ -37,6 +37,7 @@ public:
     uint16_t local_port;
     std::string remote_addr;
     uint16_t remote_port;
+    bool forward_all_to_remote;
     std::string target_addr;
     uint16_t target_port;
     std::map<std::string, std::string> password;
