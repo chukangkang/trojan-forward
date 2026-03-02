@@ -330,8 +330,8 @@ void ServerSession::out_sent() {
     if (status == FORWARD) {
         in_async_read();
     } else if (status == UDP_FORWARD) {
-        // For UDP forward, after sending to remote, wait for more UDP data from client
-        in_async_read();
+        // For UDP forward, after sending response to client, wait for more UDP data
+        udp_async_read();
     } else if (status == SOCKS5_CONNECT) {
         // Still connecting to SOCKS5 proxy, wait
     }
