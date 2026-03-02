@@ -321,11 +321,16 @@ void ServerSession::out_recv(const string &data) {
     if (status == FORWARD) {
         recv_len += data.length();
         in_async_write(data);
+    } else if (status == UDP_FORWARD) {
+        // For UDP forward, we don't expect incoming data on the TCP connection
     }
 }
 
 void ServerSession::out_sent() {
     if (status == FORWARD) {
+        in_async_read();
+    } else if (status == UDP_FORWARD) {
+        // For UDP forward, after sending to remote, wait for more UDP data from client
         in_async_read();
     } else if (status == SOCKS5_CONNECT) {
         // Still connecting to SOCKS5 proxy, wait
