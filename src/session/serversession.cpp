@@ -178,9 +178,23 @@ void ServerSession::in_recv(const string &data) {
                 // Use 0.0.0.0:0 to indicate we'll accept UDP packets from any address
                 string response = "\x05\x00\x00\x01\x00\x00\x00\x00\x00\x00";
                 in_async_write(response);
+                // Store target address for UDP forwarding
+                target_addr = req.address.address;
+                target_port = req.address.port;
+                // Start listening for incoming UDP data from client
                 udp_data_buf = out_write_buf;
-                if (!out_write_buf.empty()) {
+                if (!udp_data_buf.empty()) {
                     udp_sent();
+                } else {
+                    // No initial UDP data, just wait for incoming UDP packets
+                    boost::system::error_code ec;
+                    udp_socket.open(udp::v4(), ec);
+                    if (!ec) {
+                        udp_socket.bind(udp::endpoint(udp::v4(), 0), ec);
+                        if (!ec) {
+                            udp_async_read();
+                        }
+                    }
                 }
                 return;
             } else {
@@ -336,8 +350,8 @@ void ServerSession::out_sent() {
     if (status == FORWARD) {
         in_async_read();
     } else if (status == UDP_FORWARD) {
-        // For UDP forward, after sending response to client, wait for more UDP data
-        udp_async_read();
+        // For UDP forward, continue reading from TCP for more UDP packet data
+        in_async_read();
     } else if (status == SOCKS5_CONNECT) {
         // Still connecting to SOCKS5 proxy, wait
     }
