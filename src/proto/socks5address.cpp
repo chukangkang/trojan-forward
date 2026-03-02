@@ -84,8 +84,7 @@ string SOCKS5Address::generate(const udp::endpoint &endpoint) {
         for (int i = 0; i < 4; ++i) {
             ret += char(ip[i]);
         }
-    }
-    if (endpoint.address().is_v6()) {
+    } else if (endpoint.address().is_v6()) {
         ret += '\x04';
         auto ip = endpoint.address().to_v6().to_bytes();
         for (int i = 0; i < 16; ++i) {
