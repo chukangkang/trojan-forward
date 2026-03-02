@@ -174,8 +174,14 @@ void ServerSession::in_recv(const string &data) {
             if (req.command == TrojanRequest::UDP_ASSOCIATE) {
                 Log::log_with_endpoint(in_endpoint, "requested UDP associate to " + req.address.address + ':' + to_string(req.address.port), Log::INFO);
                 status = UDP_FORWARD;
+                // Send SOCKS5 UDP associate response: VER(1) + REP(1) + RSV(1) + ATYP(1) + BND.ADDR + BND.PORT
+                // Use 0.0.0.0:0 to indicate we'll accept UDP packets from any address
+                string response = "\x05\x00\x00\x01\x00\x00\x00\x00\x00\x00";
+                in_async_write(response);
                 udp_data_buf = out_write_buf;
-                udp_sent();
+                if (!out_write_buf.empty()) {
+                    udp_sent();
+                }
                 return;
             } else {
                 Log::log_with_endpoint(in_endpoint, "requested connection to " + req.address.address + ':' + to_string(req.address.port), Log::INFO);
